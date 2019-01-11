@@ -6,22 +6,39 @@
 		<meta charset="utf-8"/>
 		<link rel="stylesheet" type="text/css" href="./css/stylesheet.css">
 		
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	</head>
 	<script src="./pixi/pixi.js"></script>
-	<body>
-		<button id="playCards">Play cards</button>
-		<button id="getCards">Get Cards</button>
-		<button id="room1">Join Room 1</button>
-		<button id="room2">Join Room 2</button>
-		<input type="" name="" id="name">
-		<button id="updateName">Update Name in Server</button>
-		<br>
-		<button id="leave1">Leave Room 1</button>
-		<button id="leave2">Leave Room 2</button>
 
-		<script type="module" src="./src/app.js"></script>
+	<body>
+		<div id="app">
+			<button @click="playCards()">Play cards</button>
+			<button id="getCards">Get Cards</button>
+
+			<br>
+			<div id="submitName" v-if="submittedName">
+				<input v-model="username" placeholder="Enter Username">
+				<button @click="updateName()">Update Name in Server</button>
+			</div>
+
+			<br>
+			<div id="rooms" v-if="inGameLobby">
+				<button @click="leaveRoom()">Leave Room</button>
+				<button @click="startGame()">Start game</button>
+			</div>
+			
+			
+			<br>
+			
+			
+			<br>
+			<div v-for="room in rooms" class="roomTabs" :key="room.index" @click="requestJoin(room.index)">Room {{ room.index }} - {{ Object.keys(room.players).length }}/4 - {{ room.started }}</div>
+		</div>
+		
+
+		<script type="module" src="./src/main.js"></script>
+<!-- 		<script type="module" src="./src/app.js"></script> -->
 		<script type="module" src="./src/cardlogic.js"></script>
-		<script type="module" src="./src/socket.js"></script>
 	</body>
 	
 </html>

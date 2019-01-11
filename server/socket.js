@@ -42,6 +42,26 @@ const validateProperties = (data, properties) => {
 	return true;
 };
 
+const removePlayerFromRoom = (sessionInfo, index) => {
+	let session = sessionInfo[index];
+
+	if (session.roomNumber) {
+		let roomNumber = session.roomNumber;
+
+		let currentRoom = rooms[roomNumber];
+
+		// Remove player from players object
+		delete currentRoom.players[index];
+
+		// Remove index from indices array
+		let indexInIndicesArray = currentRoom.clientIndices.indexOf(index);
+		if (index > -1) {
+			currentRoom.clientIndices.splice(indexInIndicesArray, 1);
+		}
+
+	}
+}
+
 // **
 // Instantiate the Websocket server
 // **
@@ -116,6 +136,9 @@ wsServer.on('request', (request) => {
 
 	connection.on('close', (connection) => {
 		console.log(`${ ip } disconnected.`);
+
+		removePlayerFromRoom(sessionInfo, index);
+		
 		delete clients[index];
 		delete sessionInfo[index];
 	});
@@ -126,3 +149,4 @@ module.exports = {
 	validateProperties: validateProperties,
 	rooms: rooms
 }
+

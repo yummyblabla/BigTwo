@@ -106,28 +106,3 @@ const getCards = () => {
 	console.log("hey")
 	Socket.send({type: "cards", something: "now"})
 }
-
-document.querySelector("#playCards").addEventListener("click", playCards);
-
-document.querySelector("#getCards").addEventListener("click", getCards);
-
-document.querySelector("#room1").addEventListener("click", () => {
-	Lobby.requestJoin("room1");
-})
-document.querySelector("#room2").addEventListener("click", () => {
-	Lobby.requestJoin("room2");
-})
-
-document.querySelector("#leave1").addEventListener("click", () => {
-	Lobby.leaveRoom("room1");
-})
-document.querySelector("#leave2").addEventListener("click", () => {
-	Lobby.leaveRoom("room2");
-})
-
-
-
-document.querySelector("#updateName").addEventListener("click", () => {
-	let name = document.getElementById("name").value;
-	Lobby.updateName(name);
-})
