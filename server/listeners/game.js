@@ -14,7 +14,6 @@ const listener = (clients, sessionInfo, index, data) => {
 
 		case "somethingelse":
 			break;
-
 	}
 }
 

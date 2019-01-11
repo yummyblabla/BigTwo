@@ -1,6 +1,18 @@
 "use strict";
+const Deck = require("./modules/deck.js");
 
 let listeners = [];
+
+let rooms = {};
+for (let i = 1; i < 3; i++) {
+	rooms[i] = {
+		deck: new Deck.deck(),
+		players: {},
+		clientIndices: [],
+		started: false
+	};
+}
+console.log(rooms);
 
 // Check origin of connection
 const originIsAllowed = (origin) => {
@@ -80,7 +92,7 @@ wsServer.on('request', (request) => {
 	connection.on('message', (message) => {
 		if (message.type === 'utf8') {
 			let data;
-			console.log(message);
+			console.log(message); // can comment this out later
 			try {
 				data = JSON.parse(message.utf8Data);
 
@@ -111,5 +123,6 @@ wsServer.on('request', (request) => {
 
 module.exports = {
 	addListener: addListener,
-	validateProperties: validateProperties
+	validateProperties: validateProperties,
+	rooms: rooms
 }
