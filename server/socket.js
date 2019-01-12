@@ -101,7 +101,7 @@ wsServer.on('request', (request) => {
 	console.log(`${ ip } connected.`);
 
 	// Assign index of the connection
-	let index = 0;
+	let index = 1;
 	while (index in clients) {
 		index++;
 	};

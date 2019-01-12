@@ -12,33 +12,34 @@
 
 	<body>
 		<div id="app">
-			<button @click="playCards()">Play cards</button>
-			<button id="getCards">Get Cards</button>
+			<div id="ui" v-if="!gameStarted">
+				<div id="submitName" v-if="submittedName">
+					<input v-model="username" placeholder="Enter Username">
+					<button @click="updateName()">Update Name in Server</button>
+				</div>
 
-			<br>
-			<div id="submitName" v-if="submittedName">
-				<input v-model="username" placeholder="Enter Username">
-				<button @click="updateName()">Update Name in Server</button>
+				<br>
+				<div id="rooms" v-if="inGameLobby">
+					<button @click="leaveRoom()">Leave Room</button>
+					<button v-if="isHost" @click="startGame()">Start game</button>
+					<div>
+						<div>Room {{ currentRoomNumber }}</div>
+						<div v-for="player in getPlayerNames">{{ player.name }} - <span v-if="player.host">Host</span></div>
+					</div>
+				</div>
+				<div v-else v-for="room in rooms" class="roomTabs" :key="room.index" @click="requestJoin(room.index)">Room {{ room.index }} - {{ Object.keys(room.players).length }}/4 - {{ room.started }}</div>
+				
+				<br>
+				
+				
+				<br>
 			</div>
-
-			<br>
-			<div id="rooms" v-if="inGameLobby">
-				<button @click="leaveRoom()">Leave Room</button>
-				<button @click="startGame()">Start game</button>
-			</div>
 			
 			
-			<br>
-			
-			
-			<br>
-			<div v-for="room in rooms" class="roomTabs" :key="room.index" @click="requestJoin(room.index)">Room {{ room.index }} - {{ Object.keys(room.players).length }}/4 - {{ room.started }}</div>
 		</div>
-		
+		<div id="game"></div>
 
 		<script type="module" src="./src/main.js"></script>
-<!-- 		<script type="module" src="./src/app.js"></script> -->
-		<script type="module" src="./src/cardlogic.js"></script>
 	</body>
 	
 </html>

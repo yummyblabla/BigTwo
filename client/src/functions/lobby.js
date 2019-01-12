@@ -22,9 +22,10 @@ export default {
 		})
 	},
 
-	startGame() {
+	startGame(roomNumber) {
 		Socket.send({
-			type: "startGame"
+			type: "startGame",
+			roomNumber: roomNumber
 		})
 	}
 }

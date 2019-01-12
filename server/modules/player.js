@@ -22,6 +22,14 @@ Player.prototype.setHand = function(hand) {
 	this.hand = hand;
 }
 
+Player.prototype.getPlayer = function() {
+	let player = {
+		name: this.username,
+		host: this.host
+	}
+	return player;
+}
+
 module.exports = {
 	player: Player
 }

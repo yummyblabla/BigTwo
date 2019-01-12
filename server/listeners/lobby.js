@@ -34,10 +34,16 @@ const listener = (clients, sessionInfo, index, data) => {
 					return;
 				}
 
+				// Cannot join if game has started
+				if (room.started) {
+					return;
+				}
+
 				// Host boolean to see if player is the first to join
 				// Host can start the game
 				let host;
-				if (room.clientIndices.length == 0 && room.players.length == 0) {
+
+				if (room.clientIndices.length == 0 && Object.keys(room.players).length == 0) {
 					host = true;
 				} else {
 					host = false;
@@ -51,11 +57,15 @@ const listener = (clients, sessionInfo, index, data) => {
 				// Add room number to session
 				session.roomNumber = roomNumber;
 
+				// Send client message that they joined game
 				curClient.send(JSON.stringify({
 					type: "joinGame",
 					success: true,
-					host: host
-				}))
+					host: host,
+					roomNumber: roomNumber
+				}));
+
+				updateClientsWithRoomList(clients, rooms);
 			}
 			console.log(rooms);
 			break;
@@ -64,7 +74,6 @@ const listener = (clients, sessionInfo, index, data) => {
 			if (!Socket.validateProperties(data, [])) {
 				return;
 			}
-			console.log(session.room);
 			if (session.roomNumber in rooms) {
 				let roomNumber = session.roomNumber;
 				let room = rooms[roomNumber];
@@ -77,6 +86,7 @@ const listener = (clients, sessionInfo, index, data) => {
 				if (index > -1) {
 					room.clientIndices.splice(indexInIndicesArray, 1);
 				}
+				updateClientsWithRoomList(clients, rooms);
 			}
 
 			// Remove roomNumber from session
@@ -103,15 +113,35 @@ const listener = (clients, sessionInfo, index, data) => {
 			
 			break;
 		case "startGame":
-			if (!Socket.validateProperties(data, [])) {
+			if (!Socket.validateProperties(data, ["roomNumber"])) {
 				return;
 			}
-			let roomNumber = session.roomNumber;
+			let roomNumber = data.roomNumber;
 
-			rooms[roomNumber].started = true;
+			let currentRoom = rooms[roomNumber];
+
+			// Change state of room
+			currentRoom.started = true;
+
+			// Send clients in the room to start the game
+			for (let i = 0; i < currentRoom.clientIndices.length; i++) {
+				clients[currentRoom.clientIndices[i]].send(JSON.stringify({
+					type: "startGame",
+					placeholder: "something"
+				}));
+			}
 
 			console.log(rooms);
 			break;
+	}
+}
+
+const updateClientsWithRoomList = (clients, rooms) => {
+	for (let index in clients) {
+		clients[index].send(JSON.stringify({
+			type: "roomList",
+			rooms: filterRooms(rooms)
+		}))
 	}
 }
 
@@ -119,13 +149,18 @@ const filterRooms = (rooms) => {
 	let filtered = {};
 
 	for (let room in rooms) {
+		let currentRoom = rooms[room];
+
 		filtered[room] = {
-			players: rooms[room].players,
-			started: rooms[room].started,
-			index: room
+			index: room,
+			started: currentRoom.started,
+			players: {}
 		}
-		console.log(room);
+		for (let player in currentRoom.players) {
+			filtered[room].players[player] = currentRoom.players[player].getPlayer();
+		}
 	}
+	console.log(filtered);
 	return filtered;
 }
 

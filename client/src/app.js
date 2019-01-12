@@ -3,21 +3,21 @@ import Player from "./modules/player.js";
 import Opponent from "./modules/opponent.js";
 import Render from "./render.js";
 import Interactions from "./interaction.js";
-import Lobby from "./lobby.js";
-
-import * as Socket from "./socket.js";
+import * as Socket from "./socket/socket.js";
+import * as vueApp from "./main.js";
 
 let Application = PIXI.Application;
 let loader = PIXI.loader;
 let resources = PIXI.loader.resources;
 let Sprite = PIXI.Sprite;
 
-let app = new Application({ 
+export const pixiApp = new Application({ 
     width: 800,         // default: 800
     height: 600,        // default: 600
     antialias: true,    // default: false
     transparent: false, // default: false
-    resolution: 1       // default: 1
+    resolution: 1,       // default: 1
+    backgroundColor: 0x061639
 });
 
 const pushToImages = () => {
@@ -33,10 +33,9 @@ const pushToImages = () => {
 	}
 };
 
+// document.getElementById("game").appendChild(pixiApp.view);
 let images = [];
 pushToImages();
-
-document.body.appendChild(app.view);
 
 const loadProgressHandler = (loader, resource) => {
 	// console.log(`loading: ${ resource.url }`)
@@ -50,16 +49,16 @@ const setup = () => {
 	// card.scale.y = 0.5;
 	// app.stage.addChild(card);
 
-	let cards = Render.generateCards(player1);
-	for (let i = 0; i < cards.length; i++) {
-		Interactions.addCardInteraction(cards[i]);
-		app.stage.addChild(cards[i]);
-	}
+	// let cards = Render.generateCards(player1);
+	// for (let i = 0; i < cards.length; i++) {
+	// 	Interactions.addCardInteraction(cards[i]);
+	// 	app.stage.addChild(cards[i]);
+	// }
 
-	let opponent = Render.generateOpponentHands(opponent1);
-	for (let i = 0; i < cards.length; i++) {
-		app.stage.addChild(opponent[i]);
-	}
+	// let opponent = Render.generateOpponentHands(opponent1);
+	// for (let i = 0; i < cards.length; i++) {
+	// 	app.stage.addChild(opponent[i]);
+	// }
 }
 
 loader
@@ -70,24 +69,24 @@ loader
 	.load(setup);
 
 
-const deck = new Deck();
+// const deck = new Deck();
 
-let distribute = deck.distribute();
+// let distribute = deck.distribute();
 
-const player1 = new Player("Player1");
-const opponent1 = new Opponent("Opponent1", 13);
+// const player1 = new Player("Player1");
+// const opponent1 = new Opponent("Opponent1", 13);
 
 
-player1.setHand(distribute[0]);
+// player1.setHand(distribute[0]);
 
-console.log(player1.getHand());
+// console.log(player1.getHand());
 
-console.log(player1.getHand().getIndex("3", "H"))
-console.log(player1.getHand().getIndex("3", "D"))
-console.log(player1.getHand().getIndex("3", "C"))
-console.log(player1.getHand().getIndex("3", "S"))
+// console.log(player1.getHand().getIndex("3", "H"))
+// console.log(player1.getHand().getIndex("3", "D"))
+// console.log(player1.getHand().getIndex("3", "C"))
+// console.log(player1.getHand().getIndex("3", "S"))
 
-console.log(Interactions.selectedCards)
+// console.log(Interactions.selectedCards)
 
 
 
