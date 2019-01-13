@@ -16,6 +16,10 @@ Player.prototype.getHand = function() {
 	return this.hand;
 }
 
+Player.prototype.getCardsFromHand = function() {
+	return this.hand.getCards();
+}
+
 Player.prototype.setHand = function(hand) {
 	this.hand = hand;
 }

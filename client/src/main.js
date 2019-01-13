@@ -3,8 +3,6 @@ import * as pixiApp from "./app.js";
 import Interactions from "./interaction.js";
 import Lobby from "./functions/lobby.js";
 
-let gameCanvas = document.getElementById("game");
-
 export const app = new Vue({
 	el: "#app",
 	data: {
@@ -75,8 +73,10 @@ export const app = new Vue({
 				this.gameStarted = true;
 				// Socket.removeListener("roomListUpdate");
 				// Socket.removeListener("joinGame");
-				gameCanvas.appendChild(pixiApp.pixiApp.view);
+				pixiApp.initializePixi();
 			}
 		})
 	}
 });
+
+console.log()

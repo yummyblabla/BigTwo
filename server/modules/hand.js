@@ -12,6 +12,10 @@ Hand.prototype.getNumberOfCards = function() {
 	return this.cards.length;
 }
 
+Hand.prototype.setCards = function(cards) {
+	this.cards = cards;
+}
+
 Hand.prototype.discard = function(card) {
 	let index = this.cards.indexOf(card);
 
@@ -43,3 +47,4 @@ Hand.prototype.getIndex = function(rank, suit) {
 module.exports = {
 	hand: Hand
 }
+

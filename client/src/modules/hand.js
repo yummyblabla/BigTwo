@@ -8,6 +8,10 @@ Hand.prototype.getCards = function() {
 	return this.cards;
 }
 
+Hand.prototype.setCards = function(cards) {
+	this.cards = cards;
+}
+
 Hand.prototype.getNumberOfCards = function() {
 	return this.cards.length;
 }

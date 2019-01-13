@@ -1,17 +1,31 @@
 const Hand = require("./hand.js");
 
 class Player {
-	constructor(name, host) {
-		// name: string, host: boolean
+	constructor(name, index, host) {
+		// name: string, index: int (client index),host: boolean
 		this.username = name;
+		this.index = index;
 		this.host = host;
 		this.score = 0;
+		this.ready = false;
 		this.hand = new Hand.hand([]);
 	}
 }
 
 Player.prototype.getUsername = function() {
 	return this.username;
+}
+
+Player.prototype.getIndex = function() {
+	return this.index;
+}
+
+Player.prototype.getReady = function() {
+	return this.ready;
+}
+
+Player.prototype.setReady = function() {
+	this.ready = true;
 }
 
 Player.prototype.getHand = function() {

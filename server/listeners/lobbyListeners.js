@@ -1,10 +1,12 @@
 const Socket = require("./../socket.js");
 const Player = require("./../modules/player.js");
+const Game = require("./../modules/game.js");
 
 const listener = (clients, sessionInfo, index, data) => {
 	let curClient = clients[index];
 	let session = sessionInfo[index];
 	let rooms = Socket.rooms;
+	let startedGames = Socket.startedGames;
 
 	switch (data.type) {
 		case "joinRoom": 
@@ -50,7 +52,7 @@ const listener = (clients, sessionInfo, index, data) => {
 				}
 
 				// Add player instance to player object
-				room.players[index] = new Player.player(session.name, host);
+				room.players[index] = new Player.player(session.name, index, host);
 				// Add index to indices array
 				room.clientIndices.push(index);
 
@@ -122,6 +124,8 @@ const listener = (clients, sessionInfo, index, data) => {
 
 			// Change state of room
 			currentRoom.started = true;
+
+			startedGames[roomNumber] = new Game.game(roomNumber, currentRoom.players, currentRoom.clientIndices);
 
 			// Send clients in the room to start the game
 			for (let i = 0; i < currentRoom.clientIndices.length; i++) {

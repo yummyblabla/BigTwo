@@ -1,18 +1,18 @@
 "use strict";
 const Deck = require("./modules/deck.js");
 
-let listeners = [];
+const listeners = [];
 
-let rooms = {};
+const rooms = {};
 for (let i = 1; i < 3; i++) {
 	rooms[i] = {
-		deck: new Deck.deck(),
 		players: {},
 		clientIndices: [],
 		started: false
 	};
 }
-console.log(rooms);
+
+const startedGames = {};
 
 // Check origin of connection
 const originIsAllowed = (origin) => {
@@ -147,6 +147,8 @@ wsServer.on('request', (request) => {
 module.exports = {
 	addListener: addListener,
 	validateProperties: validateProperties,
-	rooms: rooms
+	rooms: rooms,
+	startedGames: startedGames,
+	clients: clients
 }
 
