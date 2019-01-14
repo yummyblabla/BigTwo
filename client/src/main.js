@@ -1,6 +1,6 @@
 import * as Socket from "./socket/socket.js";
 import * as pixiApp from "./app.js";
-import Interactions from "./interaction.js";
+import Interactions from "./functions/interaction.js";
 import Lobby from "./functions/lobby.js";
 
 export const app = new Vue({
@@ -79,4 +79,4 @@ export const app = new Vue({
 	}
 });
 
-console.log()
+pixiApp.initializePixi();

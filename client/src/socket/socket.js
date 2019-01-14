@@ -47,10 +47,3 @@ export const initialize = () => {
 	socket.onerror = onError;
 	socket.onclose = onClose;
 }
-
-
-addListener("hey", (data) => {
-	if (data.type == "test") {
-		console.log(data);
-	}
-})

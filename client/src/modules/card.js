@@ -19,3 +19,7 @@ Card.prototype.getProperties = function() {
 		suit: this.getSuit()
 	};
 }
+
+Card.prototype.convertToString = function() {
+	return this.getRank() + this.getSuit();
+}

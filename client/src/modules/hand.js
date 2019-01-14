@@ -1,3 +1,5 @@
+import CardLogic from "./../cardlogic.js";
+
 export default class Hand {
 	constructor(cards) {
 		this.cards = cards;
@@ -12,13 +14,15 @@ Hand.prototype.setCards = function(cards) {
 	this.cards = cards;
 }
 
+Hand.prototype.addCard = function(card) {
+	this.cards.push(card);
+}
+
 Hand.prototype.getNumberOfCards = function() {
 	return this.cards.length;
 }
 
-Hand.prototype.discard = function(card) {
-	let index = this.cards.indexOf(card);
-
+Hand.prototype.discard = function(index) {
 	if (index > -1) {
 		this.cards.splice(index, 1);
 		return true;
@@ -42,4 +46,8 @@ Hand.prototype.getIndex = function(rank, suit) {
 		}
 	}
 	return -1;
+}
+
+Hand.prototype.sortCards = function() {
+	this.setCards(CardLogic.mergeSort(this.cards));
 }

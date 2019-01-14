@@ -10,6 +10,7 @@ class Game {
 		this.gameIndex = index;
 		this.players = players;
 		this.clientIndices = clientIndices;
+		this.numberOfPlayers = clientIndices.length;
 		this.playerIndexTurn = null;
 	}
 }
@@ -24,9 +25,10 @@ Game.prototype.startGame = function() {
 		// Update hand in players object
 		this.players[this.clientIndices[i]].setHand(hands[i]);
 
-		// Send hand with cards to clients
+		// Send game details hand with cards to clients
 		clients[this.clientIndices[i]].send(JSON.stringify({
-			type: "cardHand",
+			type: "gameDetails",
+			numberOfPlayers: this.numberOfPlayers,
 			hand: hands[i].getCards()
 		}));
 	}

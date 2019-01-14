@@ -1,3 +1,5 @@
+import * as pixi from "./app.js";
+
 let Application = PIXI.Application;
 let loader = PIXI.loader;
 let resources = PIXI.loader.resources;
@@ -15,8 +17,8 @@ export default {
 
 
 			let sprite = new Sprite(resources[card].texture);
-			sprite.x = 10 + i * 30;
-			sprite.y = 400;
+			sprite.x = 0 + i * 30;
+			sprite.y = 0;
 			sprite.scale.x = 0.5;
 			sprite.scale.y = 0.5;
 			sprite.name = card;
@@ -40,5 +42,16 @@ export default {
 		}
 
 		return sprites;
+	},
+	rerenderCards(player) {
+		let newSprites = this.generateCards(player);
+
+		while (pixi.playerContainer.children[0]) {
+			pixi.playerContainer.removeChild(pixi.playerContainer.children[0]);
+		}
+		console.log(pixi.playerContainer);
+		for (let i = 0; i < newSprites.length; i++) {
+			pixi.playerContainer.addChild(newSprites[i]);
+		}
 	}
 }
