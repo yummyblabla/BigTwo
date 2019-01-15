@@ -12,6 +12,7 @@ class Game {
 		this.clientIndices = clientIndices;
 		this.numberOfPlayers = clientIndices.length;
 		this.playerIndexTurn = null;
+		this.currentPlay = null;
 	}
 }
 
@@ -20,33 +21,32 @@ Game.prototype.startGame = function() {
 
 	// Distribute cards to the players
 	let hands = this.deck.distribute();
-	for (let i = 0; i < this.clientIndices.length; i++) {
 
+	// Order of Player with names
+	let orderOfPlayerNames = [];
+
+	for (let i = 0; i < this.clientIndices.length; i++) {
 		// Update hand in players object
 		this.players[this.clientIndices[i]].setHand(hands[i]);
+		// Get order of the players using names
+		orderOfPlayerNames.push(this.players[this.clientIndices[i]].getUsername());
+	}
 
-		// Send game details hand with cards to clients
+	// Send game details hand with cards to clients
+	for (let i = 0; i < this.clientIndices.length; i++) {
 		clients[this.clientIndices[i]].send(JSON.stringify({
 			type: "gameDetails",
 			numberOfPlayers: this.numberOfPlayers,
-			hand: hands[i].getCards()
+			hand: hands[i].getCards(),
+			playersInOrder: orderOfPlayerNames
 		}));
 	}
+	
+	// Determine who goes first
 	this.determineFirst();
 
-	for (let i = 0; i < this.clientIndices.length; i++) {
-		let playerTurnName = this.players[this.playerIndexTurn].getUsername();
-		if (this.clientIndices[i] === this.playerIndexTurn) {
-			clients[this.clientIndices[i]].send(JSON.stringify({
-				type: "playerTurn"
-			}));
-		} else {
-			clients[this.clientIndices[i]].send(JSON.stringify({
-				type: "opponentTurn",
-				name: playerTurnName
-			}));
-		}
-	}
+	// Send out JSON to clients on who goes first
+	this.sendTurnStatus();
 }
 Game.prototype.getClientIndices = function() {
 	return this.clientIndices;
@@ -103,6 +103,37 @@ Game.prototype.determineFirst = function() {
 	if (!foundFirst) {
 		let random = Math.floor(Math.random() * this.clientIndices.length);
 		this.playerIndexTurn = this.clientIndices[random];
+	}
+	console.log(this.playerIndexTurn);
+}
+
+Game.prototype.sendTurnStatus = function() {
+	for (let i = 0; i < this.clientIndices.length; i++) {
+		let playerTurnName = this.players[this.playerIndexTurn].getUsername();
+
+		if (this.clientIndices[i] === this.playerIndexTurn) {
+			clients[this.clientIndices[i]].send(JSON.stringify({
+				type: "playerTurn"
+			}));
+		} else {
+			clients[this.clientIndices[i]].send(JSON.stringify({
+				type: "opponentTurn",
+				name: playerTurnName
+			}));
+		}
+	}
+}
+
+Game.prototype.changePlayerTurn = function() {
+	let currentTurn = this.playerIndexTurn;
+
+	let indexInClientIndices = this.clientIndices.indexOf(currentTurn);
+	indexInClientIndices++;
+
+	if (indexInClientIndices >= this.clientIndices.length) {
+		this.playerIndexTurn = this.clientIndices[0];
+	} else {
+		this.playerIndexTurn = this.clientIndices[indexInClientIndices];
 	}
 }
 

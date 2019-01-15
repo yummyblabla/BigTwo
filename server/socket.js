@@ -4,7 +4,7 @@ const Deck = require("./modules/deck.js");
 const listeners = [];
 
 const rooms = {};
-for (let i = 1; i < 4; i++) {
+for (let i = 1; i < 10; i++) {
 	rooms[i] = {
 		players: {},
 		clientIndices: [],

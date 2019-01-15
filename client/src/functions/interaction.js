@@ -9,8 +9,6 @@ let loader = PIXI.loader;
 let resources = PIXI.loader.resources;
 let Sprite = PIXI.Sprite;
 
-
-
 export default {
 	selectedCards: [],
 
@@ -35,30 +33,25 @@ export default {
 	addPlayButtonInteraction(buttonSprite) {
 		buttonSprite.interactive = true;
 		buttonSprite.on("mousedown", (data) => {
-			let currentPlayer = pixi.player1;
-			if (this.selectedCards.length > 0) {
-				console.log(pixi.player1);
+			let currentPlayer = pixi.currentPlayer;
+
+
+			if (pixi.yourTurn && this.selectedCards.length > 0) {
+				Socket.send({
+					type: "playCards",
+					gameNumber: vueApp.app.$data.currentRoomNumber,
+					cards: this.selectedCards
+				})
 				console.log(this.selectedCards);
-				for (let i = 0; i < this.selectedCards.length; i++) {
-					let cardLength = this.selectedCards[i].length;
-					// Create card object from card string
-					let selectedCard = {
-						rank: this.selectedCards[i].substr(0, cardLength - 1),
-						suit: this.selectedCards[i].substr(cardLength - 1)
-					}
-					let playerCards = currentPlayer.getCardsFromHand();
-
-					// Find index of selected card with binary search
-					let indexOfSelectedCard = CardLogic.binarySearch(playerCards, this.selectedCards[i]);
-
-					// Discard the card
-					currentPlayer.getHand().discard(indexOfSelectedCard);
-
-				}
-				Render.rerenderCards(currentPlayer);
 			}
-			
 		});
+	},
+
+	addPassButtonInteraction(buttonSprite) {
+		buttonSprite.interactive = true;
+		buttonSprite.on("mousedown", (data) => {
+			console.log("hello I passed");
+		})
 	}
 }
 

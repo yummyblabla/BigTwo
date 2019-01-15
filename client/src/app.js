@@ -4,6 +4,7 @@ import Player from "./modules/player.js";
 import Opponent from "./modules/opponent.js";
 import Render from "./render.js";
 import Interactions from "./functions/interaction.js";
+import Game from "./functions/game.js";
 
 import * as Socket from "./socket/socket.js";
 import * as vueApp from "./main.js";
@@ -24,31 +25,25 @@ const OPPONENT_SIDE_Y = 575;
 // Pixi Application
 export let pixiApp;
 
-// Player Class
+// Player / Opponent Class
 export let currentPlayer;
+let opponentLeft;
+let opponentRight;
+let opponentTop;
 
 // Containers
 let mainContainer;
 export let playerContainer;
+export let playerHandContainer;
 let opponentLeftContainer;
 let opponentRightContainer;
 let opponentTopContainer;
 
-const pushToImages = () => {
-	for (let i = 0; i < 13; i++) {
-		let ranks = 'A 2 3 4 5 6 7 8 9 10 J Q K'.split(' ');
-		let suits = 'S H C D'.split(' ');
-		for (let j = 0; j < 4; j++) {
-			images.push({
-				name: `${ranks[i]}${suits[j]}`,
-				url: `./cards/${ranks[i]}${suits[j]}.svg`
-			});
-		}
-	}
-};
-
+// Images array for pixi to load from
 let images = [];
-pushToImages();
+
+// Game Parameters;
+export let yourTurn = false;
 
 const loadProgressHandler = (loader, resource) => {
 	// console.log(`loading: ${ resource.url }`)
@@ -63,12 +58,13 @@ const setup = () => {
 	gameCanvas.appendChild(pixiApp.view);
 
 	// Send to server that PixiJS has loaded
+	Socket.send({
+		type: "readyUp",
+		gameNumber: vueApp.app.$data.currentRoomNumber
+	});
 
-	// uncomment this back
-	// Socket.send({
-	// 	type: "readyUp",
-	// 	gameNumber: vueApp.app.$data.currentRoomNumber
-	// });
+	// Initialize the container for the player
+	addPlayerContainer();
 
 	// Listener to initiate game when all players are ready
 	Socket.addListener("allReady", (data) => {
@@ -80,51 +76,49 @@ const setup = () => {
 			Socket.addListener("gameDetails", (data) => {
 				if (data.type == "gameDetails") {
 
-					initializeOpponentContainers(data.numberOfPlayers);
-
-
+					// Add new hand to currentPlayer
 					let newHand = [];
 					for (let i = 0; i < data.hand.length; i++) {
 						newHand.push(new Card(data.hand[i].rank, data.hand[i].suit));
 					}
 					currentPlayer.getHand().setCards(newHand);
+					currentPlayer.getHand().sortCards();
 
+					// Render the cards 
 					let cardSprites = Render.generateCards(currentPlayer);
 					for (let i = 0; i < cardSprites.length; i++) {
-						pixiApp.stage.addChild(cardSprites[i]);
+						Interactions.addCardInteraction(cardSprites[i]);
+						playerHandContainer.addChild(cardSprites[i]);
 					}
+
+					initializeOpponentContainers(data.numberOfPlayers);
+
+					console.log(data.playersInOrder);
 				}
 			});
 
-			Socket.addListener("determineTurn", (data) => {
-				if (data.type == "playerTurn") {
-					console.log("yourTurn");
-				} else if (data.type == "opponentTurn"){
-					console.log(`${data.name}'s turn`)
-				}
-			})
+			
 		}
 	});
+	Game.addTurnListener();
+	Game.addAcceptedPlayListener();
 
-	// let opponent = Render.generateOpponentHands(opponent1);
+	// let cards = Render.generateCards(player1);
 	// for (let i = 0; i < cards.length; i++) {
-	// 	app.stage.addChild(opponent[i]);
+	// 	Interactions.addCardInteraction(cards[i]);
+	// 	playerHandContainer.addChild(cards[i]);
 	// }
-	addPlayerContainer();
 
-	let cards = Render.generateCards(player1);
-	for (let i = 0; i < cards.length; i++) {
-		Interactions.addCardInteraction(cards[i]);
-		playerContainer.addChild(cards[i]);
-	}
-
-	createTopContainer(opponentTopContainer);
-	createLeftContainer(opponentLeftContainer);
-	createRightContainer(opponentRightContainer);
+	// createTopContainer(opponentTopContainer);
+	// createLeftContainer(opponentLeftContainer);
+	// createRightContainer(opponentRightContainer);
 	
 }
 
 export const initializePixi = () => {
+	// Add image urls to array
+	pushToImages();
+
 	pixiApp = new Application({ 
 	    width: 1280,         // default: 800
 	    height: 800,        // default: 600
@@ -140,9 +134,23 @@ export const initializePixi = () => {
 		.add({name: "blueBack", url: "./cards/BLUE_BACK.svg"})
 		.add({name: "redBack", url: "./cards/RED_BACK.svg"})
 		.add({name: "play", url: "./cards/play.png"})
+		.add({name: "pass", url: "./cards/pass.png"})
 		.on("progress", loadProgressHandler)
 		.load(setup);
 }
+
+const pushToImages = () => {
+	for (let i = 0; i < 13; i++) {
+		let ranks = 'A 2 3 4 5 6 7 8 9 10 J Q K'.split(' ');
+		let suits = 'S H C D'.split(' ');
+		for (let j = 0; j < 4; j++) {
+			images.push({
+				name: `${ranks[i]}${suits[j]}`,
+				url: `./cards/${ranks[i]}${suits[j]}.svg`
+			});
+		}
+	}
+};
 
 const addPlayButton = () => {
 	let playButton = new Sprite(resources["play"].texture);
@@ -152,6 +160,16 @@ const addPlayButton = () => {
 	playerContainer.addChild(playButton);
 }
 
+const addPassButton = () => {
+	let passButton = new Sprite(resources["pass"].texture);
+	passButton.x = 100;
+	passButton.y = 155;
+	passButton.width = 70;
+	passButton.height = 70;
+	Interactions.addPassButtonInteraction(passButton);
+	playerContainer.addChild(passButton);
+}
+
 const addPlayerContainer = () => {
 	playerContainer = new Container();
 	playerContainer.interactive = true;
@@ -159,7 +177,15 @@ const addPlayerContainer = () => {
 	playerContainer.y = 575;
 	pixiApp.stage.addChild(playerContainer);
 
+	addPlayerHandContainer();
 	addPlayButton();
+	addPassButton();
+}
+
+const addPlayerHandContainer = () => {
+	playerHandContainer = new Container();
+	playerHandContainer.interactive = true;
+	playerContainer.addChild(playerHandContainer);
 }
 
 const initializeOpponentContainers = (numberOfPlayers) => {
@@ -224,18 +250,20 @@ const createRightContainer = (container) => {
 	}
 }
 
-
-
-const deck = new Deck();
-let hands = deck.distribute();
-export const player1 = new Player("Player1");
-let playerHand = player1.getHand();
-
-for (let i = 0; i < hands[0].getCards().length; i++) {
-	playerHand.addCard(hands[0].getCards()[i]);
+export const changeToPlayerTurn = () => {
+	yourTurn = true;
 }
 
-playerHand.sortCards();
-console.log(player1);
-// const opponent1 = new Opponent("Opponent1", 13);
+
+// const deck = new Deck();
+// let hands = deck.distribute();
+// export const player1 = new Player("Player1");
+// let playerHand = player1.getHand();
+
+// for (let i = 0; i < hands[0].getCards().length; i++) {
+// 	playerHand.addCard(hands[0].getCards()[i]);
+// }
+
+// playerHand.sortCards();
+// console.log(player1);
 

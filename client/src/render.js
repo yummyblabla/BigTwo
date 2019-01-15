@@ -1,4 +1,5 @@
 import * as pixi from "./app.js";
+import Interactions from "./functions/interaction.js";
 
 let Application = PIXI.Application;
 let loader = PIXI.loader;
@@ -45,13 +46,13 @@ export default {
 	},
 	rerenderCards(player) {
 		let newSprites = this.generateCards(player);
-
-		while (pixi.playerContainer.children[0]) {
-			pixi.playerContainer.removeChild(pixi.playerContainer.children[0]);
+		// console.log(pixi.playerContainer);
+		while (pixi.playerHandContainer.children[0]) {
+			pixi.playerHandContainer.removeChild(pixi.playerHandContainer.children[0]);
 		}
-		console.log(pixi.playerContainer);
 		for (let i = 0; i < newSprites.length; i++) {
-			pixi.playerContainer.addChild(newSprites[i]);
+			Interactions.addCardInteraction(newSprites[i]);
+			pixi.playerHandContainer.addChild(newSprites[i]);
 		}
 	}
 }

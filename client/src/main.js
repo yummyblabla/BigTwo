@@ -44,7 +44,6 @@ export const app = new Vue({
 				Lobby.startGame(this.currentRoomNumber);
 			}
 		}
-
 	},
 	created() {
 		// Start socket connection
@@ -79,4 +78,4 @@ export const app = new Vue({
 	}
 });
 
-pixiApp.initializePixi();
+// pixiApp.initializePixi();
