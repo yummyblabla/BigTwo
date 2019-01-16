@@ -28,6 +28,7 @@ Game.prototype.startGame = function() {
 	for (let i = 0; i < this.clientIndices.length; i++) {
 		// Update hand in players object
 		this.players[this.clientIndices[i]].setHand(hands[i]);
+		this.players[this.clientIndices[i]].getHand().sortCards();
 		// Get order of the players using names
 		orderOfPlayerNames.push(this.players[this.clientIndices[i]].getUsername());
 	}

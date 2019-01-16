@@ -44,6 +44,10 @@ Player.prototype.getPlayer = function() {
 	return player;
 }
 
+Player.prototype.getCardsFromHand = function() {
+	return this.hand.getCards();
+}
+
 module.exports = {
 	player: Player
 }

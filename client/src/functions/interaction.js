@@ -42,7 +42,6 @@ export default {
 					gameNumber: vueApp.app.$data.currentRoomNumber,
 					cards: this.selectedCards
 				})
-				console.log(this.selectedCards);
 			}
 		});
 	},
@@ -50,7 +49,13 @@ export default {
 	addPassButtonInteraction(buttonSprite) {
 		buttonSprite.interactive = true;
 		buttonSprite.on("mousedown", (data) => {
-			console.log("hello I passed");
+			if (pixi.yourTurn) {
+				Socket.send({
+					type: "playerPass",
+					gameNumber: vueApp.app.$data.currentRoomNumber
+				})
+				console.log("I pass");
+			}
 		})
 	}
 }

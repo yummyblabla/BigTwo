@@ -30,6 +30,7 @@ export let currentPlayer;
 let opponentLeft;
 let opponentRight;
 let opponentTop;
+export let opponentArray;
 
 // Containers
 let mainContainer;
@@ -38,12 +39,27 @@ export let playerHandContainer;
 let opponentLeftContainer;
 let opponentRightContainer;
 let opponentTopContainer;
+let opponentLeftHandContainer;
+let opponentRightHandContainer;
+let opponentTopHandContainer;
+
+let opponentHandContainerArray = [];
 
 // Images array for pixi to load from
 let images = [];
 
-// Game Parameters;
+// Game Parameters
 export let yourTurn = false;
+export let playerNameTurn = null;
+
+// Font Style
+export const fontStyle = new PIXI.TextStyle({
+	fontFamily: 'Arial',
+	fontSize: 20,
+	fontStyle: 'italic',
+	fill: '#ffffff'
+});
+
 
 const loadProgressHandler = (loader, resource) => {
 	// console.log(`loading: ${ resource.url }`)
@@ -91,28 +107,20 @@ const setup = () => {
 						playerHandContainer.addChild(cardSprites[i]);
 					}
 
+					initializeOpponentInstances(data.numberOfPlayers, data.playersInOrder);
 					initializeOpponentContainers(data.numberOfPlayers);
-
-					console.log(data.playersInOrder);
 				}
 			});
 
 			
 		}
 	});
+
+	// initializeOpponentInstances(4, ["hey", "qwe", "lol", "lop"]);
+	// initializeOpponentContainers(4);
 	Game.addTurnListener();
 	Game.addAcceptedPlayListener();
-
-	// let cards = Render.generateCards(player1);
-	// for (let i = 0; i < cards.length; i++) {
-	// 	Interactions.addCardInteraction(cards[i]);
-	// 	playerHandContainer.addChild(cards[i]);
-	// }
-
-	// createTopContainer(opponentTopContainer);
-	// createLeftContainer(opponentLeftContainer);
-	// createRightContainer(opponentRightContainer);
-	
+	Game.addCardsPlayedListener();
 }
 
 export const initializePixi = () => {
@@ -180,6 +188,7 @@ const addPlayerContainer = () => {
 	addPlayerHandContainer();
 	addPlayButton();
 	addPassButton();
+	Render.renderPlayerName(currentPlayer);
 }
 
 const addPlayerHandContainer = () => {
@@ -190,80 +199,112 @@ const addPlayerHandContainer = () => {
 
 const initializeOpponentContainers = (numberOfPlayers) => {
 	if (numberOfPlayers === 2) {
-		createTopContainer(opponentTopContainer);
+		createTopContainer(opponentTopContainer, opponentTopHandContainer, opponentTop);
 	} else if (numberOfPlayers === 3) {
-		createLeftContainer(opponentLeftContainer);
-		createRightContainer(opponentRightContainer);
+		createLeftContainer(opponentLeftContainer, opponentLeftHandContainer, opponentLeft);
+		createRightContainer(opponentRightContainer, opponentRightHandContainer, opponentRight);
 	} else if (numberOfPlayers === 4) {
-		createTopContainer(opponentTopContainer);
-		createLeftContainer(opponentLeftContainer);
-		createRightContainer(opponentRightContainer);
+		createLeftContainer(opponentLeftContainer, opponentLeftHandContainer, opponentLeft);
+		createTopContainer(opponentTopContainer, opponentTopHandContainer, opponentTop);
+		createRightContainer(opponentRightContainer, opponentRightHandContainer, opponentRight);
 	}
 }
 
-const createTopContainer = (container) => {
+const createTopContainer = (container, handContainer, opponent) => {
 	container = new Container();
 	container.x = PLAYER_HAND_X;
 	container.y = 20;
 	pixiApp.stage.addChild(container);
-	for (let i = 0; i < 13; i++) {
-		let sprite = new Sprite(resources["redBack"].texture);
-		sprite.scale.x = 0.5;
-		sprite.scale.y = 0.5;
-		sprite.x = i * 30;
-		container.addChild(sprite);
+
+	handContainer = new Container();
+	handContainer.name = opponent.getUsername();
+	handContainer.y = 20;
+	opponentHandContainerArray.push(handContainer);
+	container.addChild(handContainer);
+
+	let opponentNameText = new PIXI.Text(opponent.getUsername(), fontStyle);
+	opponentNameText.y = -20;
+	container.addChild(opponentNameText);
+
+	let cardBackSprites = Render.generateOpponentCardsNotSide(opponent);
+	for (let i = 0; i < cardBackSprites.length; i++) {
+		handContainer.addChild(cardBackSprites[i]);
 	}
 	
 }
 
-const createLeftContainer = (container) => {
+const createLeftContainer = (container, handContainer, opponent) => {
 	container = new Container();
 	container.x = 20;
 	container.y = OPPONENT_SIDE_Y;
 	pixiApp.stage.addChild(container);
-	for (let i = 0; i < 13; i++) {
-		let sprite = new Sprite(resources["redBack"].texture);
-		sprite.scale.x = 0.5;
-		sprite.scale.y = 0.5;
-		sprite.x = 80;
-		sprite.y = i * -30;
-		sprite.anchor.set(0.5);
-		sprite.rotation = 1.56;
-		container.addChild(sprite);
+
+	handContainer = new Container();
+	handContainer.name = opponent.getUsername();
+	handContainer.y = -20;
+	opponentHandContainerArray.push(handContainer);
+	container.addChild(handContainer);
+
+	let opponentNameText = new PIXI.Text(opponent.getUsername(), fontStyle);
+	opponentNameText.y = 50;
+	container.addChild(opponentNameText);
+
+	let cardBackSprites = Render.generateOpponentCardsSide(opponent);
+	for (let i = 0; i < cardBackSprites.length; i++) {
+		handContainer.addChild(cardBackSprites[i]);
 	}
 }
 
-const createRightContainer = (container) => {
+const createRightContainer = (container, handContainer, opponent) => {
 	container = new Container();
 	container.x = 1080 + 20;
 	container.y = OPPONENT_SIDE_Y;
 	pixiApp.stage.addChild(container);
-	for (let i = 0; i < 13; i++) {
-		let sprite = new Sprite(resources["redBack"].texture);
-		sprite.scale.x = 0.5;
-		sprite.scale.y = 0.5;
-		sprite.x = 80;
-		sprite.y = i * -30;
-		sprite.anchor.set(0.5);
-		sprite.rotation = 1.56;
-		container.addChild(sprite);
+
+	let opponentNameText = new PIXI.Text(opponent.getUsername(), fontStyle);
+	opponentNameText.y = 50;
+	container.addChild(opponentNameText);
+
+	handContainer = new Container();
+	handContainer.name = opponent.getUsername();
+	handContainer.y = -20;
+	opponentHandContainerArray.push(handContainer);
+	container.addChild(handContainer);
+
+	let cardBackSprites = Render.generateOpponentCardsSide(opponent);
+	for (let i = 0; i < cardBackSprites.length; i++) {
+		handContainer.addChild(cardBackSprites[i]);
 	}
 }
 
+const initializeOpponentInstances = (numberOfPlayers, playerNameArray) => {
+	let indexOfCurrentPlayer = playerNameArray.indexOf(currentPlayer.getUsername());
+	let nextOpponentIndex = indexOfCurrentPlayer + 1 >= numberOfPlayers ? 0 : indexOfCurrentPlayer + 1;
+	if (numberOfPlayers === 2) {
+		opponentTop = new Opponent(playerNameArray[nextOpponentIndex], 13, false);
+		opponentArray = [opponentTop];
+	} else if (numberOfPlayers === 3) {
+		opponentLeft = new Opponent(playerNameArray[nextOpponentIndex], 13, true);
+		nextOpponentIndex = nextOpponentIndex + 1 >= numberOfPlayers ? 0 : nextOpponentIndex + 1;
+		opponentRight = new Opponent(playerNameArray[nextOpponentIndex], 13, true);
+		opponentArray = [opponentLeft, opponentRight];
+	} else if (numberOfPlayers === 4) {
+		opponentLeft = new Opponent(playerNameArray[nextOpponentIndex], 13, true);
+		nextOpponentIndex = nextOpponentIndex + 1 >= numberOfPlayers ? 0 : nextOpponentIndex + 1;
+		opponentTop = new Opponent(playerNameArray[nextOpponentIndex], 13, false);
+		nextOpponentIndex = nextOpponentIndex + 1 >= numberOfPlayers ? 0 : nextOpponentIndex + 1;
+		opponentRight = new Opponent(playerNameArray[nextOpponentIndex], 13, false);
+		opponentArray = [opponentLeft, opponentTop, opponentRight];
+	}
+}
 export const changeToPlayerTurn = () => {
 	yourTurn = true;
 }
 
+export const setPlayerNameTurn = (name) => {
+	playerNameTurn = name;
+}
 
-// const deck = new Deck();
-// let hands = deck.distribute();
-// export const player1 = new Player("Player1");
-// let playerHand = player1.getHand();
-
-// for (let i = 0; i < hands[0].getCards().length; i++) {
-// 	playerHand.addCard(hands[0].getCards()[i]);
-// }
-
-// playerHand.sortCards();
-// console.log(player1);
-
+export const getOpponentHandContainers = () => {
+	return opponentHandContainerArray;
+}

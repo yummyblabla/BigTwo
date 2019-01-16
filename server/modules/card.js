@@ -20,6 +20,10 @@ Card.prototype.getProperties = function() {
 	};
 }
 
+Card.prototype.convertToString = function() {
+	return this.getRank() + this.getSuit();
+}
+
 module.exports = {
 	card: Card
 }

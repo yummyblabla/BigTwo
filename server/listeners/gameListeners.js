@@ -1,5 +1,6 @@
 const Socket = require("./../socket.js");
 const Card = require("./../modules/card.js");
+const Helpers = require("./../modules/helpers.js");
 
 const listener = (clients, sessionInfo, index, data) => {
 	let curClient = clients[index];
@@ -20,28 +21,77 @@ const listener = (clients, sessionInfo, index, data) => {
 					return;
 				}
 
-				let currentPlay = currentGame.currentPlay;
+				// Card array to hold card instances
+				let cardClasses = [];
 
-				// sort data.cards before passing
-
-				if (evaluateCards(data.cards, currentPlay)) {
-					console.log("accepted");
-					acceptedPlay(curClient);
+				// Convert card strings into card classes
+				for (let i = 0; i < data.cards.length; i++) {
+					let cardRank = data.cards[i].substr(0, data.cards[i].length - 1);
+					let cardSuit = data.cards[i].substr(data.cards[i].length - 1);
+					cardClasses.push(new Card.card(cardRank, cardSuit));
 				}
 
-				
-				// send clients of card that is played
-				// send clients that update opponent's hand count
-				// update currentPlay
-				currentGame.changePlayerTurn();
-				currentGame.sendTurnStatus();
+				// Sort the cards for easier processing
+				cardClasses = Helpers.mergeSort(cardClasses);
 
+				// Current cards in play
+				let currentPlay = currentGame.currentPlay;
 
+				// Evaluate the played cards with cards in play
+				if (evaluateCards(cardClasses, currentPlay)) {
+					console.log("accepted");
+					acceptedPlay(curClient);
+
+					// Send clients of the card(s) that was played
+					sendClientsCardsPlayed(currentGame, session.name, data.cards);
+
+					// Update player hand
+					for (let i = 0; i < data.cards.length; i++) {
+						let playerCards = currentGame.players[index].getCardsFromHand();
+
+						// Find index of selected card with binary search
+						let indexOfSelectedCard = Helpers.binarySearch(playerCards, data.cards[i]);
+
+						currentGame.players[index].getHand().discard(indexOfSelectedCard);
+					}
+					
+					
+					// Send clients that update opponent's hand count
+					console.log(currentGame.players[index]);
+					sendClientsOpponentUpdate(currentGame.players[index]);
+
+					// update currentPlay
+
+					// Change Player Turn
+					currentGame.changePlayerTurn();
+
+					// Send clients of new turn
+					currentGame.sendTurnStatus();
+				}
 			}
-			console.log(data.cards);
 			break;
 
-		case "somethingelse":
+		case "playerPass":
+			if (!Socket.validateProperties(data, ["gameNumber"])) {
+				return;
+			}
+
+			if (data.gameNumber in Socket.startedGames) {
+				let currentGame = Socket.startedGames[data.gameNumber];
+
+				// Check if it's actually the player's turn
+				if (currentGame.playerIndexTurn !== index) {
+					return;
+				}
+
+				console.log("player pass");
+
+				// Change Player Turn
+				currentGame.changePlayerTurn();
+
+				// Send clients of new turn
+				currentGame.sendTurnStatus();
+			}
 			break;
 	}
 }
@@ -57,20 +107,31 @@ const evaluateCards = (cards, cardsInPlay) => {
 		if (cards.length == 1) {
 			return true;
 		} else if (cards.length == 2) {
-			let card1 = new Card.card(cards[0].substr(0, cards[0].length - 1), cards[0].substr(cards[0].length - 1));
-			let card2 = new Card.card(cards[1].substr(0, cards[1].length - 1), cards[1].substr(cards[1].length - 1));
-			return card1.getRank() == card2.getRank();
+			return cards[0].getRank() == cards[1].getRank();
 		} else if (cards.length == 3) {
-			let card1 = new Card.card(cards[0].substr(0, cards[0].length - 1), cards[0].substr(cards[0].length - 1));
-			let card2 = new Card.card(cards[1].substr(0, cards[1].length - 1), cards[1].substr(cards[1].length - 1));
-			let card3 = new Card.card(cards[2].substr(0, cards[2].length - 1), cards[2].substr(cards[2].length - 1));
-			return card1.getRank() == card2.getRank() && card1.getRank() == card3.getRank();
+			return cards[0].getRank() == cards[1].getRank() && cards[0].getRank() == cards[2].getRank();
 		} else if (cards.length == 4) {
 			return false;
 		} else if (cards.length == 5) {
 			return true;
 		}
 	}
+}
+
+const sendClientsCardsPlayed = (currentGame, playerName, cardsPlayed) => {
+	let clients = Socket.clients;
+	let indices = currentGame.clientIndices;
+	for (let i = 0; i < indices.length; i++) {
+		clients[indices[i]].send(JSON.stringify({
+			type: "cardPlayed",
+			player: playerName,
+			cards: cardsPlayed
+		}))
+	}
+}
+
+const sendClientsOpponentUpdate = (data) => {
+	
 }
 
 module.exports = {

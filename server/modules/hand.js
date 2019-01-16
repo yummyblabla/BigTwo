@@ -1,3 +1,5 @@
+const Helpers = require("./helpers.js");
+
 class Hand {
 	constructor(cards) {
 		this.cards = cards;
@@ -16,9 +18,7 @@ Hand.prototype.setCards = function(cards) {
 	this.cards = cards;
 }
 
-Hand.prototype.discard = function(card) {
-	let index = this.cards.indexOf(card);
-
+Hand.prototype.discard = function(index) {
 	if (index > -1) {
 		this.cards.splice(index, 1);
 		return true;
@@ -42,6 +42,10 @@ Hand.prototype.getIndex = function(rank, suit) {
 		}
 	}
 	return -1;
+}
+
+Hand.prototype.sortCards = function() {
+	this.setCards(Helpers.mergeSort(this.cards));
 }
 
 module.exports = {
