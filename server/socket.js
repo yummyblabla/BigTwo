@@ -68,16 +68,15 @@ const removePlayerFromRoom = (sessionInfo, index) => {
 
 const WebSocketServer = require('websocket').server;
 const http = require('http');
+const express = require('express');
 
-const webSocketsServerPort = 1337;
+const webSocketsServerPort = process.env.PORT || 8080;
+const app = express();
 const clients = {};
 const sessionInfo = {};
 
 
-const server = http.createServer((request, response) => {
-	// process HTTP request. Since we're writing just WebSockets
-	// server we don't have to implement anything.
-});
+const server = http.createServer(app);
 
 server.listen(webSocketsServerPort, () => {
 	console.log("Server has started.");

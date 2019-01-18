@@ -70,11 +70,10 @@ export default {
 								}
 							}
 						}
-
-						return;
+						
 					}
 				}
-				console.log(`${data.player} played ${data.cards}`);
+				Render.renderCardsInPlayArea(data.cards);
 			}
 			
 		})

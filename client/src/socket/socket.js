@@ -39,11 +39,13 @@ export const send = (data) => {
 
 let socket;
 let listeners = {};
-
+const localhost = "ws://localhost:8080";
+const server = "ws://desolate-inlet-20461.herokuapp.com";
 export const initialize = () => {
-	socket = new WebSocket("ws://localhost:1337");
+	socket = new WebSocket(localhost);
 	socket.onopen = onOpen;
 	socket.onmessage = onMessage;
 	socket.onerror = onError;
 	socket.onclose = onClose;
 }
+

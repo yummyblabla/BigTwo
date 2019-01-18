@@ -27,10 +27,44 @@ Hand.prototype.discard = function(index) {
 	}
 }
 
-Hand.prototype.iterateCards = function(callback) {
+Hand.prototype.findDiamondThree = function() {
 	for (let i = 0; i < this.cards.length; i++) {
-		callback(this.cards[i]);
+		let cardProperties = this.cards[i].getProperties();
+		if (cardProperties.rank == "3" && cardProperties.suit == "D") {
+			return true;
+		}
 	}
+	return false;
+}
+
+Hand.prototype.findClubThree = function() {
+	for (let i = 0; i < this.cards.length; i++) {
+		let cardProperties = this.cards[i].getProperties();
+		if (cardProperties.rank == "3" && cardProperties.suit == "C") {
+			return true;
+		}
+	}
+	return false;
+}
+
+Hand.prototype.findHeartThree = function() {
+	for (let i = 0; i < this.cards.length; i++) {
+		let cardProperties = this.cards[i].getProperties();
+		if (cardProperties.rank == "3" && cardProperties.suit == "H") {
+			return true;
+		}
+	}
+	return false;
+}
+
+Hand.prototype.findSpadeThree = function() {
+	for (let i = 0; i < this.cards.length; i++) {
+		let cardProperties = this.cards[i].getProperties();
+		if (cardProperties.rank == "3" && cardProperties.suit == "H") {
+			return true;
+		}
+	}
+	return false;
 }
 
 Hand.prototype.getIndex = function(rank, suit) {

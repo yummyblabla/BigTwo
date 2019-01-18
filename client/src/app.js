@@ -53,6 +53,8 @@ let opponentRightTurnContainer;
 
 export let turnContainerArray = [];
 
+const playAreaContainer = new Container();
+
 // Images array for pixi to load from
 let images = [];
 
@@ -79,6 +81,10 @@ const setup = () => {
 
 	// Add canvas to browser page
 	gameCanvas.appendChild(pixiApp.view);
+
+	// Add play area to stage
+	playAreaContainer.x = 0;
+	pixiApp.stage.addChild(playAreaContainer);
 
 	// Send to server that PixiJS has loaded
 	Socket.send({
@@ -407,4 +413,8 @@ export const getOpponentHandContainers = () => {
 
 export const getTurnContainerArray = () => {
 	return turnContainerArray;
+}
+
+export const getPlayAreaContainer = () => {
+	return playAreaContainer;
 }

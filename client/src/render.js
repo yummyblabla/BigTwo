@@ -82,5 +82,22 @@ export default {
 			Interactions.addCardInteraction(newSprites[i]);
 			pixi.playerHandContainer.addChild(newSprites[i]);
 		}
+	},
+	renderCardsInPlayArea(cards) {
+		let playArea = pixi.getPlayAreaContainer();
+		console.log(playArea);
+		// cards is an array with cards in string form
+		for (let i = 0; i < cards.length; i++) {
+			let cardSprite = new Sprite(resources[cards[i]].texture);
+			cardSprite.x = Math.random() * 150 + 550;
+			cardSprite.y = Math.random() * 150 + 200;
+			cardSprite.scale.x = CARD_SCALE;
+			cardSprite.scale.y = CARD_SCALE;
+			cardSprite.anchor.set(0);
+			cardSprite.rotation = Math.random() * 2;
+
+			playArea.addChild(cardSprite);
+		}
+
 	}
 }

@@ -54,11 +54,6 @@ const listener = (clients, sessionInfo, index, data) => {
 
 						currentGame.players[index].getHand().discard(indexOfSelectedCard);
 					}
-					
-					
-					// Send clients that update opponent's hand count
-					console.log(currentGame.players[index]);
-					sendClientsOpponentUpdate(currentGame.players[index]);
 
 					// update currentPlay
 
@@ -121,6 +116,7 @@ const evaluateCards = (cards, cardsInPlay) => {
 const sendClientsCardsPlayed = (currentGame, playerName, cardsPlayed) => {
 	let clients = Socket.clients;
 	let indices = currentGame.clientIndices;
+	console.log(indices);
 	for (let i = 0; i < indices.length; i++) {
 		clients[indices[i]].send(JSON.stringify({
 			type: "cardPlayed",
@@ -128,10 +124,6 @@ const sendClientsCardsPlayed = (currentGame, playerName, cardsPlayed) => {
 			cards: cardsPlayed
 		}))
 	}
-}
-
-const sendClientsOpponentUpdate = (data) => {
-	
 }
 
 module.exports = {

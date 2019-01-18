@@ -61,8 +61,8 @@ Game.prototype.determineFirst = function() {
 	let foundFirst = false;
 	for (let playerIndex in this.players) {
 		let playerHand = this.players[playerIndex].getHand();
-
-		if (playerHand.iterateCards(isDiamondThree)) {
+		console.log(playerHand.findDiamondThree())
+		if (playerHand.findDiamondThree()) {
 			this.playerIndexTurn = playerIndex;
 			foundFirst = true;
 			break;
@@ -72,7 +72,7 @@ Game.prototype.determineFirst = function() {
 		for (let playerIndex in this.players) {
 			let playerHand = this.players[playerIndex].getHand();
 
-			if (playerHand.iterateCards(isClubThree)) {
+			if (playerHand.findClubThree()) {
 				this.playerIndexTurn = playerIndex;
 				foundFirst = true;
 				break;
@@ -83,7 +83,7 @@ Game.prototype.determineFirst = function() {
 		for (let playerIndex in this.players) {
 			let playerHand = this.players[playerIndex].getHand();
 
-			if (playerHand.iterateCards(isHeartThree)) {
+			if (playerHand.findHeartThree()) {
 				this.playerIndexTurn = playerIndex;
 				foundFirst = true;
 				break;
@@ -94,7 +94,7 @@ Game.prototype.determineFirst = function() {
 		for (let playerIndex in this.players) {
 			let playerHand = this.players[playerIndex].getHand();
 
-			if (playerHand.iterateCards(isSpadeThree)) {
+			if (playerHand.findSpadeThree()) {
 				this.playerIndexTurn = playerIndex;
 				foundFirst = true;
 				break;
@@ -103,6 +103,7 @@ Game.prototype.determineFirst = function() {
 	}
 	if (!foundFirst) {
 		let random = Math.floor(Math.random() * this.clientIndices.length);
+		console.log("randomed")
 		this.playerIndexTurn = this.clientIndices[random];
 	}
 	console.log(this.playerIndexTurn);
@@ -136,26 +137,6 @@ Game.prototype.changePlayerTurn = function() {
 	} else {
 		this.playerIndexTurn = this.clientIndices[indexInClientIndices];
 	}
-}
-
-const isDiamondThree = (card) => {
-	let cardProperties = card.getProperties();
-	return cardProperties.rank === "3" && cardProperties.suit === "D";
-}
-
-const isClubThree = (card) => {
-	let cardProperties = card.getProperties();
-	return cardProperties.rank === "3" && cardProperties.suit === "C";
-}
-
-const isHeartThree = (card) => {
-	let cardProperties = card.getProperties();
-	return cardProperties.rank === "3" && cardProperties.suit === "H";
-}
-
-const isSpadeThree = (card) => {
-	let cardProperties = card.getProperties();
-	return cardProperties.rank === "3" && cardProperties.suit === "S";
 }
 
 module.exports = {
