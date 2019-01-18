@@ -31,10 +31,11 @@ export default {
 			if (data.type == "playerTurn") {
 				pixi.changeToPlayerTurn();
 				pixi.setPlayerNameTurn(pixi.currentPlayer.getUsername());
+				toggleTurnIndicator(pixi.getPlayerNameTurn());
 				console.log("your turn");
 			} else if (data.type == "opponentTurn"){
 				pixi.setPlayerNameTurn(data.name);
-
+				toggleTurnIndicator(pixi.getPlayerNameTurn());
 				console.log(`${data.name}'s turn`)
 			}
 		})
@@ -77,5 +78,18 @@ export default {
 			}
 			
 		})
+	}
+}
+
+const toggleTurnIndicator = (playerTurnName) => {
+	let turnContainerArray = pixi.getTurnContainerArray();
+
+	for (let i = 0; i < turnContainerArray.length; i++) {
+		if (turnContainerArray[i].visible) {
+			turnContainerArray[i].visible = false;
+		}
+		if (turnContainerArray[i].name == playerTurnName) {
+			turnContainerArray[i].visible = true;
+		}
 	}
 }

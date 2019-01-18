@@ -6,6 +6,9 @@ let loader = PIXI.loader;
 let resources = PIXI.loader.resources;
 let Sprite = PIXI.Sprite;
 
+const CARD_SCALE = 0.5;
+const CARD_SEPARATION_LENGTH = 30;
+
 export default {
 	renderPlayerName(player) {
 		let playerText = new PIXI.Text(player.getUsername(), pixi.fontStyle);
@@ -22,12 +25,11 @@ export default {
 			let cardProperty = hand[i].getProperties();
 			let card = `${ cardProperty.rank }${ cardProperty.suit }`;
 
-
 			let sprite = new Sprite(resources[card].texture);
-			sprite.x = 0 + i * 30;
+			sprite.x = 0 + i * CARD_SEPARATION_LENGTH;
 			sprite.y = 0;
-			sprite.scale.x = 0.5;
-			sprite.scale.y = 0.5;
+			sprite.scale.x = CARD_SCALE;
+			sprite.scale.y = CARD_SCALE;
 			sprite.name = card;
 			
 			sprites.push(sprite);
@@ -41,9 +43,9 @@ export default {
 
 		for (let i = 0; i < numberOfCards; i++) {
 			let sprite = new Sprite(resources["redBack"].texture);
-			sprite.scale.x = 0.5;
-			sprite.scale.y = 0.5;
-			sprite.x = i * 30;
+			sprite.scale.x = CARD_SCALE;
+			sprite.scale.y = CARD_SCALE;
+			sprite.x = i * CARD_SEPARATION_LENGTH;
 
 			sprites.push(sprite);
 		}
@@ -57,13 +59,10 @@ export default {
 
 		for (let i = 0; i < numberOfCards; i++) {
 			let sprite = new Sprite(resources.redBack.texture);
-			sprite.scale.x = 0.5;
-			sprite.scale.y = 0.5;
-			sprite.x = i * 30;
-			sprite.scale.x = 0.5;
-			sprite.scale.y = 0.5;
+			sprite.scale.x = CARD_SCALE;
+			sprite.scale.y = CARD_SCALE;
 			sprite.x = 80;
-			sprite.y = i * -30;
+			sprite.y = i * -CARD_SEPARATION_LENGTH;
 			sprite.anchor.set(0.5);
 			sprite.rotation = 1.56;
 

@@ -45,6 +45,14 @@ let opponentTopHandContainer;
 
 let opponentHandContainerArray = [];
 
+let turnIndicatorContainer;
+let playerTurnContainer;
+let opponentLeftTurnContainer;
+let opponentTopTurnContainer;
+let opponentRightTurnContainer;
+
+export let turnContainerArray = [];
+
 // Images array for pixi to load from
 let images = [];
 
@@ -59,7 +67,6 @@ export const fontStyle = new PIXI.TextStyle({
 	fontStyle: 'italic',
 	fill: '#ffffff'
 });
-
 
 const loadProgressHandler = (loader, resource) => {
 	// console.log(`loading: ${ resource.url }`)
@@ -109,18 +116,19 @@ const setup = () => {
 
 					initializeOpponentInstances(data.numberOfPlayers, data.playersInOrder);
 					initializeOpponentContainers(data.numberOfPlayers);
+					initializeTurnContainers(data.numberOfPlayers);
 				}
 			});
-
-			
 		}
 	});
 
-	// initializeOpponentInstances(4, ["hey", "qwe", "lol", "lop"]);
+	// initializeOpponentInstances(4, ["Lucas", "Pat", "Derrick", "John"]);
 	// initializeOpponentContainers(4);
+	// initializeTurnContainers(4);
 	Game.addTurnListener();
 	Game.addAcceptedPlayListener();
 	Game.addCardsPlayedListener();
+
 }
 
 export const initializePixi = () => {
@@ -143,8 +151,91 @@ export const initializePixi = () => {
 		.add({name: "redBack", url: "./cards/RED_BACK.svg"})
 		.add({name: "play", url: "./cards/play.png"})
 		.add({name: "pass", url: "./cards/pass.png"})
+		.add({name: "turn", url: "./cards/turn.png"})
 		.on("progress", loadProgressHandler)
 		.load(setup);
+}
+
+
+const initializeTurnContainers = (numberOfPlayers) => {
+	turnIndicatorContainer = new Container();
+	turnIndicatorContainer.x = 0;
+	pixiApp.stage.addChild(turnIndicatorContainer);
+
+	let createdPContainer = createPlayerTurnContainer(playerContainer, currentPlayer);
+	turnIndicatorContainer.addChild(createdPContainer);
+	turnContainerArray.push(createdPContainer);
+
+	if (numberOfPlayers == 2) {
+		let createdOTContainer = createOTTurnContainer(opponentTopTurnContainer, opponentTop);
+		turnIndicatorContainer.addChild(createdOTContainer);
+		turnContainerArray.push(createdOTContainer);
+	} else if (numberOfPlayers == 3) {
+		let createdOLContainer = createOLTurnContainer(opponentLeftTurnContainer, opponentLeft);
+		turnIndicatorContainer.addChild(createdOLContainer);
+		let createdORContainer = createORTurnContainer(opponentRightTurnContainer, opponentRight);
+		turnIndicatorContainer.addChild(createdORContainer);
+		turnContainerArray.push(createdOLContainer);
+		turnContainerArray.push(createdORContainer);
+	} else if (numberOfPlayers == 4) {
+		let createdOLContainer = createOLTurnContainer(opponentLeftTurnContainer, opponentLeft);
+		turnIndicatorContainer.addChild(createdOLContainer);
+		let createdOTContainer = createOTTurnContainer(opponentTopTurnContainer, opponentTop);
+		turnIndicatorContainer.addChild(createdOTContainer);
+		let createdORContainer = createORTurnContainer(opponentRightTurnContainer, opponentRight);
+		turnIndicatorContainer.addChild(createdORContainer);
+		turnContainerArray.push(createdOLContainer);
+		turnContainerArray.push(createdOTContainer);
+		turnContainerArray.push(createdORContainer);
+	}
+}
+
+const createPlayerTurnContainer = (container, player) => {
+	container = new Container();
+	container.x = 800;
+	container.y = 750;
+	container.name = player.getUsername();
+	container.visible = false;
+	container.addChild(createTurnSprite());
+	return container;
+}
+
+const createOLTurnContainer = (container, opponent) => {
+	container = new Container();
+	container.x = 100;
+	container.y = 645;
+	container.name = opponent.getUsername();
+	container.visible = false;
+	container.addChild(createTurnSprite());
+	return container;
+}
+
+const createOTTurnContainer = (container, opponent) => {
+	container = new Container();
+	container.x = 300;
+	container.y = 25;
+	container.name = opponent.getUsername();
+	container.visible = false;
+	container.addChild(createTurnSprite());
+	return container;
+}
+
+const createORTurnContainer = (container, opponent) => {
+	container = new Container();
+	container.x = 1100;
+	container.y = 650;
+	container.name = opponent.getUsername();
+	container.visible = false;
+	container.addChild(createTurnSprite());
+	return container;
+}
+
+const createTurnSprite = () => {
+	let turnSprite = new Sprite(resources["turn"].texture);
+	turnSprite.scale.x = 0.05;
+	turnSprite.scale.y = 0.05;
+
+	return turnSprite;
 }
 
 const pushToImages = () => {
@@ -257,7 +348,7 @@ const createLeftContainer = (container, handContainer, opponent) => {
 
 const createRightContainer = (container, handContainer, opponent) => {
 	container = new Container();
-	container.x = 1080 + 20;
+	container.x = 1100;
 	container.y = OPPONENT_SIDE_Y;
 	pixiApp.stage.addChild(container);
 
@@ -297,6 +388,7 @@ const initializeOpponentInstances = (numberOfPlayers, playerNameArray) => {
 		opponentArray = [opponentLeft, opponentTop, opponentRight];
 	}
 }
+
 export const changeToPlayerTurn = () => {
 	yourTurn = true;
 }
@@ -305,6 +397,14 @@ export const setPlayerNameTurn = (name) => {
 	playerNameTurn = name;
 }
 
+export const getPlayerNameTurn = () => {
+	return playerNameTurn;
+}
+
 export const getOpponentHandContainers = () => {
 	return opponentHandContainerArray;
+}
+
+export const getTurnContainerArray = () => {
+	return turnContainerArray;
 }
