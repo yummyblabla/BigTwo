@@ -4,7 +4,7 @@ const Deck = require("./modules/deck.js");
 const listeners = [];
 
 const rooms = {};
-for (let i = 1; i < 10; i++) {
+for (let i = 1; i <= 10; i++) {
 	rooms[i] = {
 		players: {},
 		clientIndices: [],
@@ -59,6 +59,21 @@ const removePlayerFromRoom = (sessionInfo, index) => {
 			currentRoom.clientIndices.splice(indexInIndicesArray, 1);
 		}
 
+		// Check if the player is in a started game
+		if (session.roomNumber in startedGames) {
+			let currentGame = startedGames[roomNumber];
+
+			delete currentGame.players[index];
+
+			// Decrement number of players
+			currentGame.numberOfPlayers--;
+
+			// Remove index from indices array
+			let indexInIndicesArray = currentGame.clientIndices.indexOf(index);
+			if (index > -1) {
+				currentGame.clientIndices.splice(indexInIndicesArray, 1);
+			}
+		}
 	}
 }
 

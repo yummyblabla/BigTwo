@@ -49,6 +49,7 @@ Game.prototype.startGame = function() {
 	// Send out JSON to clients on who goes first
 	this.sendTurnStatus();
 }
+
 Game.prototype.getClientIndices = function() {
 	return this.clientIndices;
 }

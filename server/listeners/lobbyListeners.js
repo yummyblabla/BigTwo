@@ -69,7 +69,6 @@ const listener = (clients, sessionInfo, index, data) => {
 
 				updateClientsWithRoomList(clients, rooms);
 			}
-			console.log(rooms);
 			break;
 
 		case "leaveRoom":
@@ -94,7 +93,6 @@ const listener = (clients, sessionInfo, index, data) => {
 			// Remove roomNumber from session
 			delete session.roomNumber;
 
-			console.log(rooms);
 			break;
 
 		case "updateName":
@@ -135,7 +133,6 @@ const listener = (clients, sessionInfo, index, data) => {
 				}));
 			}
 
-			console.log(rooms);
 			break;
 	}
 }
@@ -164,7 +161,7 @@ const filterRooms = (rooms) => {
 			filtered[room].players[player] = currentRoom.players[player].getPlayer();
 		}
 	}
-	console.log(filtered);
+
 	return filtered;
 }
 

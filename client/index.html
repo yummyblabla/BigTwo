@@ -14,26 +14,44 @@
 	<body>
 		<div id="app">
 			<div id="ui" v-if="!gameStarted">
-				<div id="submitName" v-if="submittedName">
-					<input v-model="username" placeholder="Enter Username">
-					<button @click="updateName()">Update Name in Server</button>
-				</div>
-
-				<br>
-				<div id="rooms" v-if="inGameLobby">
-					<button @click="leaveRoom()">Leave Room</button>
-					<button v-if="isHost" @click="startGame()">Start game</button>
-					<div>
-						<div>Room {{ currentRoomNumber }}</div>
-						<div v-for="player in getPlayerNames">{{ player.name }} - <span v-if="player.host">Host</span></div>
+				<h1>BigTwo</h1>
+				<div id="titleContainer" v-if="submittedName">
+					
+					<br>
+					<br>
+					<br>
+					<br>
+					<div id="submitName">
+						
+						<input id="inputName" @keyup.enter="updateName()" v-model="username" placeholder="Enter Username">
+						<br>
+						<br>
+						<button @click="updateName()">Play</button>
 					</div>
+
+					<br>
+					<br>
+					<br>
+					<h4>Made by: YummyBlaBla</h4>
 				</div>
-				<div v-else v-for="room in rooms" class="roomTabs" :key="room.index" @click="requestJoin(room.index)">Room {{ room.index }} - {{ Object.keys(room.players).length }}/4 - {{ room.started }}</div>
-				
-				<br>
-				
-				
-				<br>
+				<div v-else>
+
+					<div id="roomsContainer">
+						<div id="room" v-if="inGameLobby">
+							<button class="roomButton" @click="leaveRoom()"><h3>Leave Room</h3></button>
+							<button class="roomButton" v-if="isHost" @click="startGame()"><h3>Start Game</h3></button>
+							<div>
+								<h1>Room {{ currentRoomNumber }}</h1>
+								<br>
+								<h4 class="playerNames" v-for="player in getPlayerNames">{{ player.name }}<span v-if="player.host"> - Host</span></h4>
+							</div>
+						</div>
+
+						<h2 v-else v-for="room in rooms" class="roomTabs" :key="room.index" @click="requestJoin(room.index)">Room {{ room.index }} - {{ Object.keys(room.players).length }}/4 {{ room.started ? "- Started" : ""}}
+						</h2>
+					</div>
+	
+				</div>
 			</div>
 			
 			

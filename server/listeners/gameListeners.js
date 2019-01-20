@@ -79,8 +79,6 @@ const listener = (clients, sessionInfo, index, data) => {
 					return;
 				}
 
-				console.log("player pass");
-
 				// Change Player Turn
 				currentGame.changePlayerTurn();
 
@@ -116,7 +114,6 @@ const evaluateCards = (cards, cardsInPlay) => {
 const sendClientsCardsPlayed = (currentGame, playerName, cardsPlayed) => {
 	let clients = Socket.clients;
 	let indices = currentGame.clientIndices;
-	console.log(indices);
 	for (let i = 0; i < indices.length; i++) {
 		clients[indices[i]].send(JSON.stringify({
 			type: "cardPlayed",

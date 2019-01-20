@@ -30,6 +30,7 @@ export const app = new Vue({
 		},
 		updateName() {
 			if (this.username) {
+				this.username = this.username.substr(0, 10);
 				Lobby.updateName(this.username);
 				this.submittedName = false;
 			}
@@ -74,7 +75,7 @@ export const app = new Vue({
 				// Socket.removeListener("joinGame");
 				pixiApp.initializePixi();
 			}
-		})
+		});
 	}
 });
 
