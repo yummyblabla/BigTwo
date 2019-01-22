@@ -13,6 +13,7 @@ class Game {
 		this.numberOfPlayers = clientIndices.length;
 		this.playerIndexTurn = null;
 		this.currentPlay = null;
+		this.passCounter = 0;
 	}
 }
 
@@ -62,9 +63,8 @@ Game.prototype.determineFirst = function() {
 	let foundFirst = false;
 	for (let playerIndex in this.players) {
 		let playerHand = this.players[playerIndex].getHand();
-		console.log(playerHand.findDiamondThree())
 		if (playerHand.findDiamondThree()) {
-			this.playerIndexTurn = playerIndex;
+			this.playerIndexTurn = parseInt(playerIndex);
 			foundFirst = true;
 			break;
 		}
@@ -72,9 +72,8 @@ Game.prototype.determineFirst = function() {
 	if (!foundFirst) {
 		for (let playerIndex in this.players) {
 			let playerHand = this.players[playerIndex].getHand();
-
 			if (playerHand.findClubThree()) {
-				this.playerIndexTurn = playerIndex;
+				this.playerIndexTurn = parseInt(playerIndex);
 				foundFirst = true;
 				break;
 			}
@@ -85,7 +84,7 @@ Game.prototype.determineFirst = function() {
 			let playerHand = this.players[playerIndex].getHand();
 
 			if (playerHand.findHeartThree()) {
-				this.playerIndexTurn = playerIndex;
+				this.playerIndexTurn = parseInt(playerIndex);
 				foundFirst = true;
 				break;
 			}
@@ -96,7 +95,7 @@ Game.prototype.determineFirst = function() {
 			let playerHand = this.players[playerIndex].getHand();
 
 			if (playerHand.findSpadeThree()) {
-				this.playerIndexTurn = playerIndex;
+				this.playerIndexTurn = parseInt(playerIndex);
 				foundFirst = true;
 				break;
 			}
@@ -114,7 +113,7 @@ Game.prototype.sendTurnStatus = function() {
 	for (let i = 0; i < this.clientIndices.length; i++) {
 		let playerTurnName = this.players[this.playerIndexTurn].getUsername();
 
-		if (this.clientIndices[i] === this.playerIndexTurn) {
+		if (this.clientIndices[i] == this.playerIndexTurn) {
 			clients[this.clientIndices[i]].send(JSON.stringify({
 				type: "playerTurn"
 			}));
@@ -137,6 +136,22 @@ Game.prototype.changePlayerTurn = function() {
 		this.playerIndexTurn = this.clientIndices[0];
 	} else {
 		this.playerIndexTurn = this.clientIndices[indexInClientIndices];
+	}
+}
+
+Game.prototype.getEndGameStatus = function() {
+	return this.numberOfPlayers == 0;
+}
+
+Game.prototype.increasePassCounter = function() {
+	this.passCounter++;
+	this.checkResetPlay();
+}
+
+Game.prototype.checkResetPlay = function() {
+	if (this.passCounter + 1 >= this.numberOfPlayers) {
+		this.currentPlay = null;
+		this.passCounter = 0;
 	}
 }
 

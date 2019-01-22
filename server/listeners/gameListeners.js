@@ -11,13 +11,12 @@ const listener = (clients, sessionInfo, index, data) => {
 			if (!Socket.validateProperties(data, ["gameNumber", "cards"])) {
 				return;
 			}
-
 			// Check if gameNumber is in startedGames
 			if (data.gameNumber in Socket.startedGames) {
 				let currentGame = Socket.startedGames[data.gameNumber];
 
 				// Check if it's actually the player's turn
-				if (currentGame.playerIndexTurn !== index) {
+				if (currentGame.playerIndexTurn != index) {
 					return;
 				}
 
@@ -38,7 +37,7 @@ const listener = (clients, sessionInfo, index, data) => {
 				let currentPlay = currentGame.currentPlay;
 
 				// Evaluate the played cards with cards in play
-				if (evaluateCards(cardClasses, currentPlay)) {
+				if (Helpers.evaluateCards(cardClasses, currentPlay)) {
 					console.log("accepted");
 					acceptedPlay(curClient);
 
@@ -55,13 +54,21 @@ const listener = (clients, sessionInfo, index, data) => {
 						currentGame.players[index].getHand().discard(indexOfSelectedCard);
 					}
 
-					// update currentPlay
+					if (currentGame.players[index].getHand().getNumberOfCards() == 0) {
+						// If number of cards is 0, then round is over
+						console.log("round over");
+					} else {
+						// update currentPlay
+						currentGame.currentPlay = cardClasses;
+						console.log(currentGame.currentPlay)
 
-					// Change Player Turn
-					currentGame.changePlayerTurn();
+						// Change Player Turn
+						currentGame.changePlayerTurn();
 
-					// Send clients of new turn
-					currentGame.sendTurnStatus();
+						// Send clients of new turn
+						currentGame.sendTurnStatus();
+					}
+					
 				}
 			}
 			break;
@@ -70,12 +77,15 @@ const listener = (clients, sessionInfo, index, data) => {
 			if (!Socket.validateProperties(data, ["gameNumber"])) {
 				return;
 			}
-
 			if (data.gameNumber in Socket.startedGames) {
 				let currentGame = Socket.startedGames[data.gameNumber];
 
 				// Check if it's actually the player's turn
 				if (currentGame.playerIndexTurn !== index) {
+					return;
+				}
+				// Player cannot pass if they have control
+				if (currentGame.currentPlay == null) {
 					return;
 				}
 
@@ -84,6 +94,9 @@ const listener = (clients, sessionInfo, index, data) => {
 
 				// Send clients of new turn
 				currentGame.sendTurnStatus();
+
+				// Increase pass counter
+				currentGame.increasePassCounter();
 			}
 			break;
 	}
@@ -93,22 +106,6 @@ const acceptedPlay = (curClient) => {
 	curClient.send(JSON.stringify({
 		type: "playAccepted"
 	}))
-}
-
-const evaluateCards = (cards, cardsInPlay) => {
-	if (cardsInPlay == null) {
-		if (cards.length == 1) {
-			return true;
-		} else if (cards.length == 2) {
-			return cards[0].getRank() == cards[1].getRank();
-		} else if (cards.length == 3) {
-			return cards[0].getRank() == cards[1].getRank() && cards[0].getRank() == cards[2].getRank();
-		} else if (cards.length == 4) {
-			return false;
-		} else if (cards.length == 5) {
-			return true;
-		}
-	}
 }
 
 const sendClientsCardsPlayed = (currentGame, playerName, cardsPlayed) => {

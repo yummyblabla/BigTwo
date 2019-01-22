@@ -73,6 +73,12 @@ const removePlayerFromRoom = (sessionInfo, index) => {
 			if (index > -1) {
 				currentGame.clientIndices.splice(indexInIndicesArray, 1);
 			}
+
+			if (currentGame.getEndGameStatus()) {
+				delete startedGames[roomNumber];
+
+				rooms[roomNumber].started = false;
+			}
 		}
 	}
 }

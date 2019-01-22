@@ -60,7 +60,7 @@ Hand.prototype.findHeartThree = function() {
 Hand.prototype.findSpadeThree = function() {
 	for (let i = 0; i < this.cards.length; i++) {
 		let cardProperties = this.cards[i].getProperties();
-		if (cardProperties.rank == "3" && cardProperties.suit == "H") {
+		if (cardProperties.rank == "3" && cardProperties.suit == "S") {
 			return true;
 		}
 	}

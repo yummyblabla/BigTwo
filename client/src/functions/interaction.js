@@ -34,8 +34,6 @@ export default {
 		buttonSprite.interactive = true;
 		buttonSprite.on("mousedown", (data) => {
 			let currentPlayer = pixi.currentPlayer;
-
-
 			if (pixi.yourTurn && this.selectedCards.length > 0) {
 				Socket.send({
 					type: "playCards",
